@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#080b11" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Chrono" />
+    <meta name="description" content="Control de tiempo y rentabilidad por proyectos" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.svg" />
+    <title>Chrono</title>
+    <script type="module" crossorigin src="./assets/index-CJ3yh0Hx.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BjUOyXBw.css">
+  </head>
+  <body>
+    <div id="app">
+      <!-- App Header -->
+      <header class="app-header">
+        <div class="header-brand">
+          <div class="brand-icon" id="brand-icon"></div>
+          <h1 class="brand-title">Chrono</h1>
+        </div>
+        <div class="header-status-badge" id="header-status">Inactivo</div>
+      </header>
+
+      <!-- Mini Timer Banner (visible on other tabs when running) -->
+      <div class="mini-timer-bar" id="mini-timer-bar" hidden>
+        <div class="mini-timer-info">
+          <span class="mini-timer-digits" id="mini-timer-digits">00:00:00</span>
+          <span class="mini-timer-label" id="mini-timer-label">Cronómetro activo</span>
+        </div>
+        <button class="mini-timer-action" id="btn-mini-timer-open" type="button">Ver</button>
+      </div>
+
+      <!-- Main Viewport -->
+      <main class="main-viewport" id="main-viewport">
+        <!-- Views are rendered dynamically into this container -->
+      </main>
+
+      <!-- Bottom Navigation -->
+      <nav class="bottom-nav" id="bottom-nav">
+        <button class="nav-tab active" data-tab="timer" type="button">
+          <span class="nav-icon" id="icon-tab-timer"></span>
+          <span>Cronómetro</span>
+        </button>
+        <button class="nav-tab" data-tab="projects" type="button">
+          <span class="nav-icon" id="icon-tab-projects"></span>
+          <span>Proyectos</span>
+        </button>
+        <button class="nav-tab" data-tab="activities" type="button">
+          <span class="nav-icon" id="icon-tab-activities"></span>
+          <span>Actividades</span>
+        </button>
+        <button class="nav-tab" data-tab="settings" type="button">
+          <span class="nav-icon" id="icon-tab-settings"></span>
+          <span>Ajustes</span>
+        </button>
+      </nav>
+
+      <!-- Modal: Proyecto (Crear / Editar) -->
+      <dialog class="app-modal" id="modal-project">
+        <form method="dialog" id="form-project">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-project-title">Nuevo Proyecto</h2>
+            <button class="btn-icon-sm" type="button" id="btn-close-project-modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="project-field-id" value="" />
+            <div class="timer-target-field">
+              <label class="target-label" for="project-field-name">Nombre del proyecto</label>
+              <input class="target-input" id="project-field-name" type="text" required placeholder="Ej. Rediseño Web" />
+            </div>
+            <div class="timer-target-field">
+              <label class="target-label" for="project-field-desc">Descripción (opcional)</label>
+              <textarea class="target-input" id="project-field-desc" rows="2" placeholder="Detalles o alcance"></textarea>
+            </div>
+            <div class="timer-target-field">
+              <label class="target-label" for="project-field-cost">Costo total pactado ($)</label>
+              <input class="target-input" id="project-field-cost" type="number" step="0.01" min="0" required placeholder="0.00" />
+            </div>
+            <div class="timer-target-field">
+              <label class="target-label" for="project-field-completed">Estado</label>
+              <select class="target-select" id="project-field-completed">
+                <option value="false">En progreso</option>
+                <option value="true">Terminado</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-modal-cancel" type="button" id="btn-cancel-project">Cancelar</button>
+            <button class="btn-modal-confirm" type="submit">Guardar</button>
+          </div>
+        </form>
+      </dialog>
+
+      <!-- Modal: Guardar / Asignar Actividad al Detener -->
+      <dialog class="app-modal" id="modal-activity">
+        <form method="dialog" id="form-activity">
+          <div class="modal-header">
+            <h2 class="modal-title" id="modal-activity-title">Guardar Actividad</h2>
+            <button class="btn-icon-sm" type="button" id="btn-close-activity-modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="activity-field-id" value="" />
+            <div class="timer-target-field">
+              <label class="target-label" for="activity-field-project">Proyecto</label>
+              <select class="target-select" id="activity-field-project" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div class="timer-target-field">
+              <label class="target-label" for="activity-field-title">Título de la actividad</label>
+              <input class="target-input" id="activity-field-title" type="text" required placeholder="Ej. Maquetación del header" />
+            </div>
+            <div class="timer-target-field">
+              <label class="target-label" for="activity-field-duration">Duración (minutos)</label>
+              <input class="target-input" id="activity-field-duration" type="number" min="1" required placeholder="Minutos trabajados" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-modal-cancel" type="button" id="btn-cancel-activity">Cancelar</button>
+            <button class="btn-modal-confirm" type="submit">Guardar</button>
+          </div>
+        </form>
+      </dialog>
+
+      <!-- Modal: Confirmar Eliminación -->
+      <dialog class="app-modal" id="modal-confirm">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modal-confirm-title">Confirmar</h2>
+        </div>
+        <div class="modal-body">
+          <p class="empty-state-text" id="modal-confirm-message">¿Estás seguro de continuar?</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-modal-cancel" type="button" id="btn-confirm-cancel">Cancelar</button>
+          <button class="btn-modal-confirm danger" type="button" id="btn-confirm-ok">Eliminar</button>
+        </div>
+      </dialog>
+
+      <!-- Hidden file input for backup restoration -->
+      <input type="file" id="input-restore-file" accept="application/json" hidden />
+    </div>
+
+  </body>
+</html>
